@@ -2,21 +2,24 @@ package com.company;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
+import java.util.Map;
 
 public class EmployeeWage implements IComputeWage{
+    //constant
     public static final int isPartTime=0;
     public static final int isFullTime=1;
+
     private ArrayList<CompanyEmpWage> empList;
-    private LinkedList<Integer>dailyWage;
+    private Map<String,CompanyEmpWage> empWageMap;
     public EmployeeWage() {
         empList=new ArrayList<>();
-        dailyWage=new LinkedList<>();
+        empWageMap=new HashMap<>();
     }
     @Override
     public void addCompanyEmpWage(String company, int empRatePerHour, int numOfWorkingDays, int maximumHoursPerMonth) {
         CompanyEmpWage empWage=new CompanyEmpWage(company,empRatePerHour,numOfWorkingDays,maximumHoursPerMonth);
         empList.add(empWage);
+        empWageMap.put(company,empWage);
     }
 
     @Override
@@ -27,7 +30,11 @@ public class EmployeeWage implements IComputeWage{
         }
 
     }
-    HashMap<String,LinkedList> companyDailyWage=new HashMap<>();
+    @Override
+    public int getTotalWage(String company) {
+        return empWageMap.get(company).totalWage;
+    }
+
     private  int computeEmpWage(CompanyEmpWage companyEmpWage) {
         int empHours=0, totalEmpHours=0, totalWorkingDays=0;
         while(totalEmpHours<=companyEmpWage.maximumHoursPerMonth && totalWorkingDays<companyEmpWage.numOfWorkingDays){
@@ -44,12 +51,7 @@ public class EmployeeWage implements IComputeWage{
             }
             totalEmpHours+=empHours;
             totalWorkingDays+=1;
-            dailyWage.add(empHours*companyEmpWage.empRatePerHour);
-
         }
-        companyDailyWage.put(companyEmpWage.company, dailyWage);
-        System.out.println("Daily Wage for the "+companyEmpWage.company+" is :"+dailyWage);
-        dailyWage.clear();
         return (totalEmpHours*companyEmpWage.empRatePerHour);
 
     }
@@ -58,6 +60,7 @@ public class EmployeeWage implements IComputeWage{
         employeeWage.addCompanyEmpWage("Dmart", 15, 21, 80);
         employeeWage.addCompanyEmpWage("Reliance", 15, 18, 100);
         employeeWage.computeEmpWage();
+        System.out.println("Total wage for Reliance company: "+employeeWage.getTotalWage("Reliance"));
     }
 
 }
